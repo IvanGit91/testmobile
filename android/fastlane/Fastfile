@@ -149,19 +149,19 @@ lane :bumpup do
   increment_version_name(app_project_dir: '**/app', bump_type: 'patch')
   increment_version_code(app_project_dir: '**/app')
 
-  #Demo
-  increment_version_name(
-    app_project_dir: '**/app',
-    bump_type: 'patch',
-    flavor: 'demo'
-  )
-  increment_version_code(app_project_dir: '**/app', flavor: "demo")
+  #internal
+  # increment_version_name(
+  #   app_project_dir: '**/app',
+  #   bump_type: 'patch',
+  #   flavor: 'internal'
+  # )
+  # increment_version_code(app_project_dir: '**/app', flavor: "internal")
 
-  #Qa
-  increment_version_name(
-    app_project_dir: '**/app',
-    bump_type: 'patch',
-    flavor: 'qa'
-  )
-  increment_version_code(app_project_dir: '**/app', flavor: "qa")
+  # #Qa
+  # increment_version_name(
+  #   app_project_dir: '**/app',
+  #   bump_type: 'patch',
+  #   flavor: 'internal'
+  # )
+  # increment_version_code(app_project_dir: '**/app', flavor: "internal")
 end

@@ -134,8 +134,8 @@ android {
         applicationId "it.sample.test"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        //versionCode 16
-        //versionName "0.0.16"
+        //versionCode 18
+        //versionName "0.0.18"
     }
 
     splits {
