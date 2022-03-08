@@ -134,8 +134,8 @@ android {
         applicationId "it.sample.test"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 16
-        versionName "0.0.16"
+        //versionCode 16
+        //versionName "0.0.16"
     }
 
     splits {
@@ -175,16 +175,21 @@ android {
 
     flavorDimensions "default"
     productFlavors {
-      demo {
+      internal {
         // dimension "version"
         // applicationId "com.foo.qa.demo"
-        versionCode 23
-        versionName "0.0.23"
+        versionCode 27
+        versionName "0.0.27"
         signingConfig signingConfigs.release
       }
-      qa {
-        versionCode 3
-        versionName "0.0.3"
+      closed {
+        versionCode 1
+        versionName "0.0.1"
+        signingConfig signingConfigs.release
+      }
+      open {
+        versionCode 2
+        versionName "0.0.2"
         signingConfig signingConfigs.release
       }
     }

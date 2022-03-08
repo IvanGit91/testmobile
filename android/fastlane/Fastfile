@@ -39,32 +39,71 @@
 
 default_platform(:android)
 
-# Ex: fastlane beta flavor:demo
+# Ex: fastlane beta build_type:internal update:patch
 platform :android do
+
+  admitted = ["internal", "closed", "open"]
+
   desc "Submit a new Internal Draft Build to Play Store"
   lane :beta do |options|
-    flavor = options[:flavor]
+    build_type = options[:build_type]
+
+    if build_type == nil
+      UI.user_error!("'build_type' parameter not present")
+      # UI.important "Skipping build because a cached build is available!"
+      # next # skip doing the rest of this lane
+    end
+
+    if !admitted.include?(build_type)
+      UI.user_error!("'" + build_type + "' must be one of: 'internal', 'closed', 'open'")
+    end
+    UI.message("Build type present and correct: #{build_type}")
+
+
+    admitted_bump = ["major", "minor", "patch"]
+    to_update = options[:update]
+
+    if to_update == nil
+      UI.user_error!("'update' parameter not present")
+      # UI.important "Skipping build because a cached build is available!"
+      # next # skip doing the rest of this lane
+    end
+
+    if !admitted_bump.include?(to_update)
+      UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
+    end
+    UI.message("to_update present and correct: #{to_update}")
+
+
     gradle(task: 'clean')
+    UI.message("Gradle clean success")
 
     # Increment version
-    increment_version_name(
+    version_name = increment_version_name(
       app_project_dir: '**/app',
-      bump_type: 'patch',
-      flavor: flavor
+      bump_type: to_update,
+      flavor: build_type
     )
-    increment_version_code(app_project_dir: '**/app', flavor: flavor)
+    UI.message("New version name: #{version_name}")
+
+    version_code = increment_version_code(app_project_dir: '**/app', flavor: build_type)
+    UI.message("New version code: #{version_code}")
 
     gradle(
       # task: 'assemble',
       task: 'bundle',
-      flavor: flavor,
+      flavor: build_type,
       build_type: 'Release',     
       print_command: false
     )
+    UI.message("Gradle bundle succeded")
+
     upload_to_play_store(
-      track: 'internal',
-      release_status: 'draft'
+      track: build_type,
+      release_status: 'draft',
+      version_name: version_name
     )
+    UI.message("Deploy succesfull")
   end
 end
 
