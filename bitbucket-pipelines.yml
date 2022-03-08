@@ -1,0 +1,16 @@
+image: tatocaster/fastlanedocker:1.0
+
+pipelines:
+  branches:
+    development:
+      - step:
+          name: "Build on docker and run fastlane"
+          deployment: develop
+          caches:
+            - gradle
+            - android-sdk
+            - ruby-gems
+            - gradlew
+          script:           
+            - cd android
+            - fastlane beta flavor:demo

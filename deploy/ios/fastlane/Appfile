@@ -1,0 +1,8 @@
+app_identifier("dk.ApS.mindcap") # The bundle identifier of your app
+apple_id("michele.cimmino@lastingdynamics.com") # Your Apple email address
+
+itc_team_id("121873807") # App Store Connect Team ID
+team_id("XDGMRL3AVC") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

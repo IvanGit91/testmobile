@@ -1,0 +1,39 @@
+# This is a sample build configuration for Other.
+# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: reactnativecommunity/react-native-android
+pipelines:
+  branches:
+    dev:
+      #the first step of a pipeline can't be trigger manually
+      - step:
+          name: Empty
+          deployment: test
+          script:
+            - echo test
+
+      - step:
+          #manual step
+          name: Deploy to test
+          deployment: production
+          trigger: manual
+          caches:
+            - gradle
+          script:
+            - bash deploy.sh "${PROD_BASE_URL}" "${MYAPP_RELEASE_STORE_FILE}" "${MYAPP_RELEASE_KEY_ALIAS}" "${MYAPP_RELEASE_KEY_PASSWORD}" "${MYAPP_RELEASE_STORE_PASSWORD}"
+            - npm install
+            - npx jetify
+            - cd android
+            - chmod +x gradlew
+            - bash ./gradlew assembleRelease
+            - cd ..
+            - bash bundle.sh "${PROD_BASE_URL}" "${STAGING_BASE_URL}"
+            - cd android
+            - bash ./gradlew bundleRelease
+            - cd ..
+            - bash upload.sh "${BITBUCKET_USERNAME}" "${BITBUCKET_APP_PASSWORD}" "${BITBUCKET_REPO_OWNER}" "${BITBUCKET_REPO_SLUG}"
+            - git add android/app/build.gradle
+            - git commit -m "increased version code"
+            - git push origin dev
