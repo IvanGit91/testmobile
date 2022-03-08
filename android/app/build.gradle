@@ -173,8 +173,8 @@ android {
       internal {
         // dimension "version"
         // applicationId "com.foo.qa.demo"
-        versionCode 29
-        versionName "0.0.29"
+        versionCode 30
+        versionName "0.0.30"
         signingConfig signingConfigs.bitrise
       }
       closed {
