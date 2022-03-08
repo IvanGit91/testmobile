@@ -134,8 +134,8 @@ android {
         applicationId "it.sample.test"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        //versionCode 22
-        //versionName "0.0.22"
+        //versionCode 23
+        //versionName "0.0.23"
     }
 
     splits {
@@ -173,8 +173,8 @@ android {
       internal {
         // dimension "version"
         // applicationId "com.foo.qa.demo"
-        versionCode 28
-        versionName "0.0.28"
+        versionCode 29
+        versionName "0.0.29"
         signingConfig signingConfigs.bitrise
       }
       closed {
