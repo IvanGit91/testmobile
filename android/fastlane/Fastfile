@@ -98,6 +98,15 @@ platform :android do
     )
     UI.message("Gradle bundle succeded")
 
+
+    git_commit(path: "..", message: "Version Bump")
+    push_to_git_remote(
+      remote: "origin",         # optional, default: "origin"
+      local_branch: "master",  # optional, aliased by "branch", default is set to current branch
+      remote_branch: "master"
+    )
+    UI.message("Branch updated")
+
     upload_to_play_store(
       track: build_type,
       release_status: 'draft',
