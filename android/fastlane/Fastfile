@@ -164,4 +164,12 @@ lane :bumpup do
   #   flavor: 'internal'
   # )
   # increment_version_code(app_project_dir: '**/app', flavor: "internal")
+
+  git_commit(path: "..", message: "Version Bump")
+  push_to_git_remote(
+    remote: "origin",         # optional, default: "origin"
+    local_branch: "master",  # optional, aliased by "branch", default is set to current branch
+    remote_branch: "master"
+  )
+
 end
