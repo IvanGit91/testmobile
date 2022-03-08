@@ -171,7 +171,7 @@ android {
 
         }
         bitrise {
-            storeFile file("my_key.keystore")
+            storeFile file("key/my_key.keystore")
             storePassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PASSWORD")
             keyAlias System.getenv("BITRISEIO_ANDROID_KEYSTORE_ALIAS")
             keyPassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD")           
