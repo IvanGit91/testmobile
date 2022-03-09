@@ -29,6 +29,8 @@ build/
 local.properties
 *.iml
 *.hprof
+android/app/key
+android/keystore.properties
 
 # node.js
 #
@@ -58,3 +60,4 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+

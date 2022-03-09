@@ -39,25 +39,26 @@
 
 default_platform(:android)
 
-# Ex: fastlane beta build_type:internal update:patch
+# Ex: fastlane beta build_type:debug flavor_type:internal update:patch
 platform :android do
 
   admitted = ["internal", "closed", "open"]
 
   desc "Submit a new Internal Draft Build to Play Store"
   lane :beta do |options|
-    build_type = options[:build_type]
 
-    if build_type == nil
-      UI.user_error!("'build_type' parameter not present")
+    flavor_type = options[:flavor_type]
+
+    if flavor_type == nil
+      UI.user_error!("'flavor_type' parameter not present")
       # UI.important "Skipping build because a cached build is available!"
       # next # skip doing the rest of this lane
     end
 
-    if !admitted.include?(build_type)
-      UI.user_error!("'" + build_type + "' must be one of: 'internal', 'closed', 'open'")
+    if !admitted.include?(flavor_type)
+      UI.user_error!("'" + flavor_type + "' must be one of: 'internal', 'closed', 'open'")
     end
-    UI.message("Build type present and correct: #{build_type}")
+    UI.message("Build type present and correct: #{flavor_type}")
 
 
     admitted_bump = ["major", "minor", "patch"]
@@ -78,21 +79,21 @@ platform :android do
     gradle(task: 'clean')
     UI.message("Gradle clean success")
 
-    # Increment version
+    Increment version
     version_name = increment_version_name(
       app_project_dir: '**/app',
       bump_type: to_update,
-      flavor: build_type
+      flavor: flavor_type
     )
     UI.message("New version name: #{version_name}")
 
-    version_code = increment_version_code(app_project_dir: '**/app', flavor: build_type)
+    version_code = increment_version_code(app_project_dir: '**/app', flavor: flavor_type)
     UI.message("New version code: #{version_code}")
 
     gradle(
       # task: 'assemble',
       task: 'bundle',
-      flavor: build_type,
+      flavor: flavor_type,
       build_type: 'Release',     
       print_command: false
     )
@@ -108,7 +109,7 @@ platform :android do
     UI.message("Branch updated")
 
     upload_to_play_store(
-      track: build_type,
+      track: flavor_type,
       release_status: 'draft',
       version_name: version_name
     )
