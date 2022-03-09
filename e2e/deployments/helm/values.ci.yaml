@@ -1,4 +1,0 @@
----
-api-service:
-  image:
-    name: "{{ .repository }}:{{ .tag }}"
