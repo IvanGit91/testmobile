@@ -14,7 +14,7 @@
 # update_fastlane
 
 ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = "rvxk-pjlg-ficz-fgab"
-# ENV["SPACESHIP_CONNECT_API_IN_HOUSE"] = 'true'
+ENV["SPACESHIP_CONNECT_API_IN_HOUSE"] = 'true'
 
 default_platform(:ios)
 
