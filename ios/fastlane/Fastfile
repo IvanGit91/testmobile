@@ -45,7 +45,7 @@ platform :ios do
     #get_certificates
     #get_provisioning_profile(app_identifier: "it.sample.test")
 
-    enable_automatic_code_signing(path: "test.xcodeproj)
+    enable_automatic_code_signing(path: "test.xcodeproj")
     build_ios_app(workspace: "test.xcworkspace", scheme: "test")
     upload_to_testflight
   end
