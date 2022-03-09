@@ -14,15 +14,15 @@
 # update_fastlane
 
 ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = "rvxk-pjlg-ficz-fgab"
-ENV["SPACESHIP_CONNECT_API_IN_HOUSE"] = 'true'
+# ENV["SPACESHIP_CONNECT_API_IN_HOUSE"] = 'true'
 
 default_platform(:ios)
 
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    get_certificates
-    get_provisioning_profile(app_identifier: "it.sample.test")
+    # get_certificates
+    # get_provisioning_profile(app_identifier: "it.sample.test")
 
     increment_build_number(xcodeproj: "test.xcodeproj")
     build_ios_app(workspace: "test.xcworkspace", scheme: "test")
