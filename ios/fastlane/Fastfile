@@ -1,0 +1,154 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = "rvxk-pjlg-ficz-fgab"
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    get_certificates
+    get_provisioning_profile(app_identifier: "it.sample.test")
+
+    increment_build_number(xcodeproj: "test.xcodeproj")
+    build_ios_app(workspace: "test.xcworkspace", scheme: "test")
+    upload_to_testflight
+  end
+
+
+
+
+
+
+  # Ex: fastlane beta2 update:patch
+  desc "Push a new beta build to TestFlight"
+  lane :beta2 do |options|
+    to_update = options[:update]
+    incrementvb(
+      update: to_update
+    )
+
+    get_certificates
+    get_provisioning_profile(app_identifier: "it.sample.test")
+
+    build_ios_app(workspace: "test.xcworkspace", scheme: "test")
+    upload_to_testflight
+  end
+
+
+  # Ex: fastlane incrementvb update:patch
+  lane :incrementvb do |options|
+
+    admitted = ["major", "minor", "patch"]
+
+    to_update = options[:update]
+
+    if to_update == nil
+      UI.user_error!("'update' parameter not present")
+      # UI.important "Skipping build because a cached build is available!"
+      # next # skip doing the rest of this lane
+    end
+
+    if !admitted.include?(to_update)
+      UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
+    end
+
+
+    if to_update == "major"
+      index = 0
+    elsif to_update == "minor"
+      index = 1
+    else # patch
+      index = 2
+    end
+
+    cur_build = ios_get_build_number(
+      xcodeproj: "test.xcodeproj" # optional
+    )
+
+    arr_build = cur_build.split(".")
+    patch_build = arr_build[index].to_i + 1
+    arr_build[index] = patch_build.to_s 
+    new_version = arr_build.join(".")
+    ios_set_build_number(
+      build_number: new_version,
+      xcodeproj: "test.xcodeproj"
+    )
+
+    ios_set_version(
+      version: new_version,
+      xcodeproj: "test.xcodeproj"
+    )
+  end
+
+
+
+
+
+
+
+  # Ex: fastlane test update:patch
+  lane :test do |options|
+
+    admitted = ["major", "minor", "patch"]
+
+    to_update = options[:update]
+
+    if to_update == nil
+      UI.user_error!("'update' parameter not present")
+      # UI.important "Skipping build because a cached build is available!"
+      # next # skip doing the rest of this lane
+    end
+
+    if !admitted.include?(to_update)
+      UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
+    end
+
+
+    if to_update == "major"
+      index = 0
+    elsif to_update == "minor"
+      index = 1
+    else # patch
+      index = 2
+    end
+
+    cur_version = ios_get_version(
+      xcodeproj: "test.xcodeproj" # optional
+    )
+
+    arr_version = cur_version.split(".")
+    patch_version = arr_version[index].to_i + 1
+    arr_version[index] = patch_version.to_s 
+    ios_set_version(
+      version: arr_version.join("."),
+      xcodeproj: "test.xcodeproj" # optional
+    )
+
+    cur_build = ios_get_build_number(
+      xcodeproj: "test.xcodeproj" # optional
+    )
+
+    arr_build = cur_build.split(".")
+    patch_build = arr_build[index].to_i + 1
+    arr_build[index] = patch_build.to_s 
+    ios_set_build_number(
+      build_number: arr_build.join("."), # optional, if not specified, Build Number will be incremented
+      xcodeproj: "test.xcodeproj" # optional
+    )
+  end
+
+end
