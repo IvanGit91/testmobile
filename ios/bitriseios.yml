@@ -1,0 +1,63 @@
+---
+format_version: '11'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: react-native
+app:
+  envs:
+  - FASTLANE_XCODE_LIST_TIMEOUT: '120'
+  - opts:
+      is_expand: false
+    FASTLANE_WORK_DIR: ios
+  - opts:
+      is_expand: false
+    FASTLANE_LANE: ios beta2 update:patch
+workflows:
+  primary:
+    steps:
+    - activate-ssh-key@4:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - git-clone@6: {}
+    - yarn@0:
+        inputs:
+        - command: install
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            rm ~/git/.ruby-version
+    - certificate-and-profile-installer@1: {}
+    - cocoapods-install@2: {}
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            # write your script here
+            pod install
+        - working_dir: "$BITRISE_SOURCE_DIR/ios"
+    - manage-ios-code-signing@1:
+        inputs:
+        - project_path: "$BITRISE_SOURCE_DIR/ios/test.xcworkspace"
+        - scheme: test
+        - distribution_method: app-store
+    - fastlane@3:
+        inputs:
+        - lane: "$FASTLANE_LANE"
+        - connection: api_key
+        - api_key_path: "$BITRISEIO_IOS_AUTH_KEY_URL"
+        - api_issuer: 5f1bb80c-00e2-4d13-9802-5333d021f569
+        - work_dir: "$FASTLANE_WORK_DIR"
+    - deploy-to-bitrise-io@2: {}
+meta:
+  bitrise.io:
+    stack: osx-xcode-13.1.x
+    machine_type_id: g2.4core
