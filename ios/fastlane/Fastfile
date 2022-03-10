@@ -47,10 +47,10 @@ platform :ios do
 
     # enable_automatic_code_signing(path: "test.xcodeproj", use_automatic_signing: true)
     # automatic code signing
-    # update_code_signing_settings(
-    #     use_automatic_signing: true,
-    #     path: "test.xcodeproj"
-    # )
+    update_code_signing_settings(
+        use_automatic_signing: true,
+        path: "test.xcodeproj"
+    )
     build_ios_app(workspace: "test.xcworkspace", scheme: "test")
     upload_to_testflight
   end
