@@ -21,7 +21,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane ios localbeta
 ```
 
-Incremente version, build app, push a new beta build to TestFlight, update branch
+Increment version, build app, push a new beta build to TestFlight, update branch
 
 ### ios risebeta
 
@@ -29,7 +29,7 @@ Incremente version, build app, push a new beta build to TestFlight, update branc
 [bundle exec] fastlane ios risebeta
 ```
 
-From bitrise, incremente version, build app, push a new beta build to TestFlight, update branch
+From bitrise, increment version, build app, push a new beta build to TestFlight, update branch
 
 ### ios incrementvb
 
