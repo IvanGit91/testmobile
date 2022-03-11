@@ -13,34 +13,71 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-### show_version
-
-```sh
-[bundle exec] fastlane show_version
-```
-
-
-
-### bumpup
-
-```sh
-[bundle exec] fastlane bumpup
-```
-
-
-
-----
-
-
 ## Android
 
-### android beta
+### android ld_deploy
 
 ```sh
-[bundle exec] fastlane android beta
+[bundle exec] fastlane android ld_deploy
 ```
 
-Submit a new Internal Draft Build to Play Store
+Clean, increment version/name, build, deploy and submit a new testflight version
+
+### android check_flavor
+
+```sh
+[bundle exec] fastlane android check_flavor
+```
+
+
+
+### android clean
+
+```sh
+[bundle exec] fastlane android clean
+```
+
+
+
+### android incrementvb
+
+```sh
+[bundle exec] fastlane android incrementvb
+```
+
+
+
+### android build_and_deploy
+
+```sh
+[bundle exec] fastlane android build_and_deploy
+```
+
+
+
+### android commit_and_push
+
+```sh
+[bundle exec] fastlane android commit_and_push
+```
+
+
+
+### android show_version
+
+```sh
+[bundle exec] fastlane android show_version
+```
+
+
+
+### android bumpup
+
+```sh
+[bundle exec] fastlane android bumpup
+```
+
+
 
 ----
 
