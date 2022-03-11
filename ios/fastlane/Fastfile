@@ -53,7 +53,7 @@ platform :ios do
       update: to_update
     )
     
-    code_signing()
+    # code_signing()
 
     build_and_deploy()
 
