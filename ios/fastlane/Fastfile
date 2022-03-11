@@ -29,17 +29,12 @@ platform :ios do
 
   # ------- BUILD WITH LOCAL FASTLANE ---------- #
   # Ex: fastlane localbeta update:patch
-  desc "Incremente version, build app, push a new beta build to TestFlight, update branch"
+  desc "Increment version, build app, push a new beta build to TestFlight, update branch"
   lane :localbeta do |options|
-    to_update = options[:update]
-    #incrementvb(
-    #  update: to_update
-    #)
-    
-    enable_automatic_code_signing(
-      path: PROJECT_EXT
+    incrementvb(
+      update: options[:update]
     )
-
+    
     code_signing()
 
     certificate_and_provisioning()
@@ -52,11 +47,10 @@ platform :ios do
 
   # ------- BUILD WITH BITRISE ---------- #
   # Ex: fastlane risebeta update:patch
-  desc "From bitrise, incremente version, build app, push a new beta build to TestFlight, update branch"
+  desc "From bitrise, increment version, build app, push a new beta build to TestFlight, update branch"
   lane :risebeta do |options|
-    to_update = options[:update]
     incrementvb(
-      update: to_update
+      update: options[:update]
     )
     
     # code_signing()
@@ -137,16 +131,19 @@ platform :ios do
 
 
   lane :certificate_and_provisioning do
-    #get_certificates
-    cert(username: "development@lastingdynamics.com")
-    sigh(force: true)
+    cert()
     UI.message("Got certificates")
 
-    #get_provisioning_profile(app_identifier: PROJECT_BUNDLE)
-    #UI.message("Got provisioning profile")
+
+    sigh(force: true)
+    UI.message("Got provisioning profile")
   end
 
+
   lane :code_signing do
+    enable_automatic_code_signing(
+      path: PROJECT_EXT
+    )
     update_code_signing_settings(
         use_automatic_signing: true,
         path: PROJECT_EXT
