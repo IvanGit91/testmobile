@@ -19,47 +19,50 @@ ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = "rvxk-pjlg-ficz-fgab"
 default_platform(:ios)
 
 platform :ios do
-  desc "Push a new beta build to TestFlight"
-  lane :beta do
-    get_certificates
-    get_provisioning_profile(app_identifier: "it.sample.test")
 
-    increment_build_number(xcodeproj: "test.xcodeproj")
-    build_ios_app(workspace: "test.xcworkspace", scheme: "test")
-    upload_to_testflight
-  end
+  ADMITTED_BUMP = ["major", "minor", "patch"]
+  PROJECT_BUNDLE = "it.sample.test"
+  PROJECT_NAME = "test"
+  PROJECT_EXT = "#{PROJECT_NAME}.xcodeproj"
+  WORKSPACE_EXT = "#{PROJECT_NAME}.xcworkspace"
+  
 
-
-
-
-
-
-  # Ex: fastlane beta2 update:patch
-  desc "Push a new beta build to TestFlight"
-  lane :beta2 do |options|
+  # ------- BUILD WITH LOCAL FASTLANE ---------- #
+  # Ex: fastlane localbeta update:patch
+  desc "Incremente version, build app, push a new beta build to TestFlight, update branch"
+  lane :localbeta do |options|
     to_update = options[:update]
     incrementvb(
       update: to_update
     )
+    
+    certificate_and_provisioning()
 
-    #get_certificates
-    #get_provisioning_profile(app_identifier: "it.sample.test")
+    build_and_deploy()
 
-    # enable_automatic_code_signing(path: "test.xcodeproj", use_automatic_signing: true)
-    # automatic code signing
-    #update_code_signing_settings(
-    #    use_automatic_signing: true,
-    #    path: "test.xcodeproj"
-    #)
-    build_ios_app(workspace: "test.xcworkspace", scheme: "test")
-    upload_to_testflight
+    commit_and_push()
+  end
+
+
+  # ------- BUILD WITH BITRISE ---------- #
+  # Ex: fastlane risebeta update:patch
+  desc "From bitrise, incremente version, build app, push a new beta build to TestFlight, update branch"
+  lane :risebeta do |options|
+    to_update = options[:update]
+    incrementvb(
+      update: to_update
+    )
+    
+    code_signing()
+
+    build_and_deploy()
+
+    commit_and_push()
   end
 
 
   # Ex: fastlane incrementvb update:patch
   lane :incrementvb do |options|
-
-    admitted = ["major", "minor", "patch"]
 
     to_update = options[:update]
 
@@ -69,7 +72,7 @@ platform :ios do
       # next # skip doing the rest of this lane
     end
 
-    if !admitted.include?(to_update)
+    if !ADMITTED_BUMP.include?(to_update)
       UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
     end
 
@@ -83,34 +86,82 @@ platform :ios do
     end
 
     cur_build = ios_get_build_number(
-      xcodeproj: "test.xcodeproj" # optional
+      xcodeproj: PROJECT_EXT
     )
 
     arr_build = cur_build.split(".")
     patch_build = arr_build[index].to_i + 1
     arr_build[index] = patch_build.to_s 
     new_version = arr_build.join(".")
-    ios_set_build_number(
+    new_ios_build = ios_set_build_number(
       build_number: new_version,
-      xcodeproj: "test.xcodeproj"
+      xcodeproj: PROJECT_EXT
     )
+    UI.message("New ios build: #{new_ios_build}")
 
-    ios_set_version(
+    new_ios_version = ios_set_version(
       version: new_version,
-      xcodeproj: "test.xcodeproj"
+      xcodeproj: PROJECT_EXT
     )
+    UI.message("New ios version: #{new_ios_version}")
+    UI.message("Version '" + to_update + "' incremented")
+  end
+
+
+  lane :build_and_deploy do
+    build_ios_app(workspace: WORKSPACE_EXT, scheme: PROJECT_NAME)
+    UI.message("App builded")
+
+    upload_to_testflight
+    UI.message("Uploaded to testflight")
+  end
+
+
+  lane :commit_and_push do
+    git_commit(path: "..", message: "Version Bump")
+    UI.message("Commit done")
+
+    push_to_git_remote(
+      remote: "origin",
+      local_branch: "master",
+      remote_branch: "master"
+    )
+    UI.message("Branch updated")
+  end
+
+
+  lane :certificate_and_provisioning do
+    get_certificates
+    UI.message("Got certificates")
+
+    get_provisioning_profile(app_identifier: PROJECT_BUNDLE)
+    UI.message("Got provisioning profile")
+  end
+
+  lane :code_signing do
+    update_code_signing_settings(
+        use_automatic_signing: true,
+        path: PROJECT_EXT
+    )
+    UI.message("Updated code signing")
   end
 
 
 
+# ------------------ TESTING ---------------------- #
 
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    get_certificates
+    get_provisioning_profile(app_identifier: PROJECT_BUNDLE)
 
+    increment_build_number(xcodeproj: PROJECT_EXT)
+    build_ios_app(workspace: WORKSPACE_EXT, scheme: PROJECT_NAME)
+    upload_to_testflight
+  end
 
-
-  # Ex: fastlane test update:patch
-  lane :test do |options|
-
-    admitted = ["major", "minor", "patch"]
+  # Ex: fastlane testversion update:patch
+  lane :testversion do |options|
 
     to_update = options[:update]
 
@@ -120,7 +171,7 @@ platform :ios do
       # next # skip doing the rest of this lane
     end
 
-    if !admitted.include?(to_update)
+    if !ADMITTED_BUMP.include?(to_update)
       UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
     end
 
@@ -134,7 +185,7 @@ platform :ios do
     end
 
     cur_version = ios_get_version(
-      xcodeproj: "test.xcodeproj" # optional
+      xcodeproj: PROJECT_EXT # optional
     )
 
     arr_version = cur_version.split(".")
@@ -142,11 +193,11 @@ platform :ios do
     arr_version[index] = patch_version.to_s 
     ios_set_version(
       version: arr_version.join("."),
-      xcodeproj: "test.xcodeproj" # optional
+      xcodeproj: PROJECT_EXT
     )
 
     cur_build = ios_get_build_number(
-      xcodeproj: "test.xcodeproj" # optional
+      xcodeproj: PROJECT_EXT
     )
 
     arr_build = cur_build.split(".")
@@ -154,8 +205,7 @@ platform :ios do
     arr_build[index] = patch_build.to_s 
     ios_set_build_number(
       build_number: arr_build.join("."), # optional, if not specified, Build Number will be incremented
-      xcodeproj: "test.xcodeproj" # optional
+      xcodeproj: PROJECT_EXT
     )
   end
-
 end

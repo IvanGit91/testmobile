@@ -39,30 +39,64 @@
 
 default_platform(:android)
 
-# Ex: fastlane beta build_type:debug flavor_type:internal update:patch
+
+# ------------- BUILD WITH LOCAL AND BITRISE ------------------- #
+# Ex: fastlane ld_deploy flavor_type:internal update:patch
 platform :android do
 
-  admitted = ["internal", "closed", "open"]
+  ADMITTED_BUMP = ["major", "minor", "patch"]
+  ADMITTED_FLAVOR = ["internal", "closed", "open"]
 
-  desc "Submit a new Internal Draft Build to Play Store"
-  lane :beta do |options|
+  desc "Clean, increment version/name, build, deploy and submit a new testflight version"
+  lane :ld_deploy do |options|
 
     flavor_type = options[:flavor_type]
 
+    check_flavor(
+      flavor_type: flavor_type
+    )
+
+    clean()
+
+    version_name = incrementvb(
+      update: options[:update],
+      flavor_type: flavor_type
+    )
+
+    build_and_deploy(
+      flavor_type: flavor_type,
+      version_name: version_name
+    )
+
+    commit_and_push()
+  end
+
+
+  lane :check_flavor do |options|
+    flavor_type = options[:flavor_type]
     if flavor_type == nil
       UI.user_error!("'flavor_type' parameter not present")
       # UI.important "Skipping build because a cached build is available!"
       # next # skip doing the rest of this lane
     end
 
-    if !admitted.include?(flavor_type)
+    if !ADMITTED_FLAVOR.include?(flavor_type)
       UI.user_error!("'" + flavor_type + "' must be one of: 'internal', 'closed', 'open'")
     end
     UI.message("Build type present and correct: #{flavor_type}")
+  end
 
 
-    admitted_bump = ["major", "minor", "patch"]
+  lane :clean do
+    gradle(task: 'clean')
+    UI.message("Gradle clean success")
+  end
+
+  
+  lane :incrementvb do |options|
+
     to_update = options[:update]
+    flavor_type = options[:flavor_type]
 
     if to_update == nil
       UI.user_error!("'update' parameter not present")
@@ -70,16 +104,12 @@ platform :android do
       # next # skip doing the rest of this lane
     end
 
-    if !admitted_bump.include?(to_update)
+    if !ADMITTED_BUMP.include?(to_update)
       UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
     end
     UI.message("to_update present and correct: #{to_update}")
 
-
-    gradle(task: 'clean')
-    UI.message("Gradle clean success")
-
-    Increment version
+    # Increment version
     version_name = increment_version_name(
       app_project_dir: '**/app',
       bump_type: to_update,
@@ -89,7 +119,12 @@ platform :android do
 
     version_code = increment_version_code(app_project_dir: '**/app', flavor: flavor_type)
     UI.message("New version code: #{version_code}")
+    version_name
+  end
 
+
+  lane :build_and_deploy do |options|
+    flavor_type = options[:flavor_type]
     gradle(
       # task: 'assemble',
       task: 'bundle',
@@ -99,15 +134,7 @@ platform :android do
     )
     UI.message("Gradle bundle succeded")
 
-
-    git_commit(path: "..", message: "Version Bump")
-    push_to_git_remote(
-      remote: "origin",         # optional, default: "origin"
-      local_branch: "master",  # optional, aliased by "branch", default is set to current branch
-      remote_branch: "master"
-    )
-    UI.message("Branch updated")
-
+    version_name = options[:version_name]
     upload_to_play_store(
       track: flavor_type,
       release_status: 'draft',
@@ -115,71 +142,82 @@ platform :android do
     )
     UI.message("Deploy succesfull")
   end
+
+
+  lane :commit_and_push do
+    git_commit(path: "..", message: "Version Bump")
+    UI.message("Commit done")
+
+    push_to_git_remote(
+      remote: "origin",         # optional, default: "origin"
+      local_branch: "master",  # optional, aliased by "branch", default is set to current branch
+      remote_branch: "master"
+    )
+    UI.message("Branch updated")
+  end
+
+
+  # TESTING
+  lane :show_version do
+    # Default
+    version = get_version_name(app_project_dir: '**/app')
+    UI.message("Default: #{version}")
+    version_code = get_version_code(app_project_dir: '**/app')
+    UI.message("Default: #{version_code}")
+
+    # Demo
+    version_demo = get_version_name(
+      app_project_dir: '**/app',
+      flavor: 'demo'
+    )
+    UI.message("demo flavor: #{version_demo}")
+    version_code_demo = get_version_code(
+      app_project_dir: '**/app',
+      flavor: 'demo'
+    )
+    UI.message("demo flavor: #{version_code_demo}")
+
+    # Qa
+    version_qa = get_version_name(
+      app_project_dir: '**/app',
+      flavor: 'qa'
+    )
+    UI.message("qa flavor: #{version_qa}")
+    version_code_qa = get_version_code(
+      app_project_dir: '**/app',
+      flavor: 'qa'
+    )
+    UI.message("qa flavor: #{version_code_qa}")
+  end
+
+
+  #major minor patch build
+  lane :bumpup do
+    # Default
+    increment_version_name(app_project_dir: '**/app', bump_type: 'patch')
+    increment_version_code(app_project_dir: '**/app')
+
+    #internal
+    # increment_version_name(
+    #   app_project_dir: '**/app',
+    #   bump_type: 'patch',
+    #   flavor: 'internal'
+    # )
+    # increment_version_code(app_project_dir: '**/app', flavor: "internal")
+
+    # #Qa
+    # increment_version_name(
+    #   app_project_dir: '**/app',
+    #   bump_type: 'patch',
+    #   flavor: 'internal'
+    # )
+    # increment_version_code(app_project_dir: '**/app', flavor: "internal")
+
+    commit()
+  end
+
 end
 
 
 
 
-# TESTING
-lane :show_version do
-  # Default
-  version = get_version_name(app_project_dir: '**/app')
-  UI.message("Default: #{version}")
-  version_code = get_version_code(app_project_dir: '**/app')
-  UI.message("Default: #{version_code}")
-
-  # Demo
-  version_demo = get_version_name(
-    app_project_dir: '**/app',
-    flavor: 'demo'
-  )
-  UI.message("demo flavor: #{version_demo}")
-  version_code_demo = get_version_code(
-    app_project_dir: '**/app',
-    flavor: 'demo'
-  )
-  UI.message("demo flavor: #{version_code_demo}")
-
-  # Qa
-  version_qa = get_version_name(
-    app_project_dir: '**/app',
-    flavor: 'qa'
-  )
-  UI.message("qa flavor: #{version_qa}")
-  version_code_qa = get_version_code(
-    app_project_dir: '**/app',
-    flavor: 'qa'
-  )
-  UI.message("qa flavor: #{version_code_qa}")
-end
-
-#major minor patch build
-lane :bumpup do
-  # Default
-  increment_version_name(app_project_dir: '**/app', bump_type: 'patch')
-  increment_version_code(app_project_dir: '**/app')
-
-  #internal
-  # increment_version_name(
-  #   app_project_dir: '**/app',
-  #   bump_type: 'patch',
-  #   flavor: 'internal'
-  # )
-  # increment_version_code(app_project_dir: '**/app', flavor: "internal")
-
-  # #Qa
-  # increment_version_name(
-  #   app_project_dir: '**/app',
-  #   bump_type: 'patch',
-  #   flavor: 'internal'
-  # )
-  # increment_version_code(app_project_dir: '**/app', flavor: "internal")
-
-  git_commit(path: "..", message: "Version Bump")
-  push_to_git_remote(
-    remote: "origin",         # optional, default: "origin"
-    local_branch: "master",  # optional, aliased by "branch", default is set to current branch
-    remote_branch: "master"
-  )
-
-end
