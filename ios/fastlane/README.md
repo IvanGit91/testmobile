@@ -15,21 +15,21 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios beta
+### ios localbeta
 
 ```sh
-[bundle exec] fastlane ios beta
+[bundle exec] fastlane ios localbeta
 ```
 
-Push a new beta build to TestFlight
+Incremente version, build app, push a new beta build to TestFlight, update branch
 
-### ios beta2
+### ios risebeta
 
 ```sh
-[bundle exec] fastlane ios beta2
+[bundle exec] fastlane ios risebeta
 ```
 
-Push a new beta build to TestFlight
+From bitrise, incremente version, build app, push a new beta build to TestFlight, update branch
 
 ### ios incrementvb
 
@@ -39,10 +39,50 @@ Push a new beta build to TestFlight
 
 
 
-### ios test
+### ios build_and_deploy
 
 ```sh
-[bundle exec] fastlane ios test
+[bundle exec] fastlane ios build_and_deploy
+```
+
+
+
+### ios commit_and_push
+
+```sh
+[bundle exec] fastlane ios commit_and_push
+```
+
+
+
+### ios certificate_and_provisioning
+
+```sh
+[bundle exec] fastlane ios certificate_and_provisioning
+```
+
+
+
+### ios code_signing
+
+```sh
+[bundle exec] fastlane ios code_signing
+```
+
+
+
+### ios beta
+
+```sh
+[bundle exec] fastlane ios beta
+```
+
+Push a new beta build to TestFlight
+
+### ios testversion
+
+```sh
+[bundle exec] fastlane ios testversion
 ```
 
 

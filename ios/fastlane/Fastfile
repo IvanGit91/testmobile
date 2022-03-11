@@ -32,10 +32,16 @@ platform :ios do
   desc "Incremente version, build app, push a new beta build to TestFlight, update branch"
   lane :localbeta do |options|
     to_update = options[:update]
-    incrementvb(
-      update: to_update
-    )
+    #incrementvb(
+    #  update: to_update
+    #)
     
+    enable_automatic_code_signing(
+      path: PROJECT_EXT
+    )
+
+    code_signing()
+
     certificate_and_provisioning()
 
     build_and_deploy()
@@ -112,7 +118,7 @@ platform :ios do
     build_ios_app(workspace: WORKSPACE_EXT, scheme: PROJECT_NAME)
     UI.message("App builded")
 
-    upload_to_testflight
+    upload_to_testflight(skip_waiting_for_build_processing: true)
     UI.message("Uploaded to testflight")
   end
 
@@ -131,11 +137,13 @@ platform :ios do
 
 
   lane :certificate_and_provisioning do
-    get_certificates
+    #get_certificates
+    cert(username: "development@lastingdynamics.com")
+    sigh(force: true)
     UI.message("Got certificates")
 
-    get_provisioning_profile(app_identifier: PROJECT_BUNDLE)
-    UI.message("Got provisioning profile")
+    #get_provisioning_profile(app_identifier: PROJECT_BUNDLE)
+    #UI.message("Got provisioning profile")
   end
 
   lane :code_signing do
