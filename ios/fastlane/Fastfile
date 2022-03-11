@@ -92,6 +92,14 @@ platform :ios do
     arr_build = cur_build.split(".")
     patch_build = arr_build[index].to_i + 1
     arr_build[index] = patch_build.to_s 
+    # Reset other version
+    if index == 0
+      arr_build[index+1] = "0"
+      arr_build[index+2] = "0"
+    elsif index == 1
+      arr_build[index+1] = "0"
+    end
+
     new_version = arr_build.join(".")
     new_ios_build = ios_set_build_number(
       build_number: new_version,
@@ -118,7 +126,7 @@ platform :ios do
 
 
   lane :commit_and_push do
-    git_commit(path: "..", message: "Version Bump")
+    git_commit(path: ".", message: "Version Bump")
     UI.message("Commit done")
 
     push_to_git_remote(

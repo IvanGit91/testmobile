@@ -145,7 +145,7 @@ platform :android do
 
 
   lane :commit_and_push do
-    git_commit(path: "..", message: "Version Bump")
+    git_commit(path: ".", message: "Version Bump")
     UI.message("Commit done")
 
     push_to_git_remote(
@@ -197,13 +197,13 @@ platform :android do
     increment_version_name(app_project_dir: '**/app', bump_type: 'patch')
     increment_version_code(app_project_dir: '**/app')
 
-    #internal
-    # increment_version_name(
-    #   app_project_dir: '**/app',
-    #   bump_type: 'patch',
-    #   flavor: 'internal'
-    # )
-    # increment_version_code(app_project_dir: '**/app', flavor: "internal")
+    # internal
+    increment_version_name(
+      app_project_dir: '**/app',
+      bump_type: 'minor',
+      flavor: 'internal'
+    )
+    increment_version_code(app_project_dir: '**/app', flavor: "internal")
 
     # #Qa
     # increment_version_name(
@@ -213,7 +213,7 @@ platform :android do
     # )
     # increment_version_code(app_project_dir: '**/app', flavor: "internal")
 
-    commit()
+    # commit()
   end
 
 end
