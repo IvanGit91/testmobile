@@ -79,6 +79,14 @@ Clean, increment version/name, build, deploy and submit a new testflight version
 
 
 
+### android incrementtest
+
+```sh
+[bundle exec] fastlane android incrementtest
+```
+
+
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
