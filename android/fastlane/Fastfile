@@ -216,6 +216,48 @@ platform :android do
     # commit()
   end
 
+  # Ex: fastlane incrementtest update:patch
+  lane :incrementtest do |options|
+
+    to_update = options[:update]
+
+    if to_update == nil
+      UI.user_error!("'update' parameter not present")
+    end
+
+    if !ADMITTED_BUMP.include?(to_update)
+      UI.user_error!("'" + to_update + "' must be one of: 'minor', 'major', 'patch'")
+    end
+
+    if to_update == "major"
+      index = 0
+    elsif to_update == "minor"
+      index = 1
+    else # patch
+      index = 2
+    end
+
+    cur_build = get_version_name(
+      app_project_dir: '**/app',
+      flavor: 'internal'
+    )
+    UI.message("Current version: #{cur_build}")
+    arr_build = cur_build.split(".")
+    patch_build = arr_build[index].to_i + 1
+    arr_build[index] = patch_build.to_s 
+    # Reset other version
+    if index == 0
+      arr_build[1] = "0"
+      arr_build[2] = "0"
+    elsif index == 1
+      arr_build[2] = "0"
+    end
+
+    new_version = arr_build.join(".")
+    UI.message("New ios version: #{new_version}")
+    UI.message("Version '" + to_update + "' incremented")
+  end
+
 end
 
 
