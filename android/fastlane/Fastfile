@@ -41,7 +41,8 @@ default_platform(:android)
 
 
 # ------------- BUILD WITH LOCAL AND BITRISE ------------------- #
-# Ex: fastlane ld_deploy flavor_type:internal build_type:releaselocal update:patch
+# Ex build local: fastlane ld_deploy flavor_type:internal build_type:releaselocal update:patch
+# Ex build bitrise: fastlane ld_deploy flavor_type:internal build_type:release update:patch
 platform :android do
 
   ADMITTED_BUMP = ["major", "minor", "patch"]
