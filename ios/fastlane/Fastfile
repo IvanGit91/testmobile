@@ -163,6 +163,11 @@ platform :ios do
 
 # ------------------ TESTING ---------------------- #
 
+  lane :inctest do |options|
+    incrementtest(
+      update: options[:update]
+    )
+  end
 
   # Ex: fastlane incrementtest update:patch
   lane :incrementtest do |options|
@@ -209,6 +214,10 @@ platform :ios do
     UI.message("Version '" + to_update + "' incremented")
   end
 
+
+
+
+  
   desc "Push a new beta build to TestFlight"
   lane :beta do
     get_certificates
