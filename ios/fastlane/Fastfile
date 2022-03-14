@@ -94,10 +94,10 @@ platform :ios do
     arr_build[index] = patch_build.to_s 
     # Reset other version
     if index == 0
-      arr_build[index+1] = "0"
-      arr_build[index+2] = "0"
+      arr_build[1] = "0"
+      arr_build[2] = "0"
     elsif index == 1
-      arr_build[index+1] = "0"
+      arr_build[2] = "0"
     end
 
     new_version = arr_build.join(".")
