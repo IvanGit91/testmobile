@@ -78,7 +78,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
+    enableHermes: true,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -118,7 +118,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
-def enableHermes = project.ext.react.get("enableHermes", false);
+def enableHermes = project.ext.react.get("enableHermes", true);
 
 /**
  * Architectures to build native code for in debug.
@@ -134,6 +134,7 @@ android {
         applicationId "it.sample.test"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         //versionCode 26
         //versionName "0.0.26"
     }
@@ -155,21 +156,23 @@ android {
         }
 
         release {
-            // Load keystore
-            // def keystorePropertiesFile = rootProject.file('keystore.properties')
-            // def keystoreProperties = new Properties()
-            // keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
-            // storeFile file(keystoreProperties["RELEASE_STORE_FILE"])
-            // storePassword keystoreProperties["RELEASE_STORE_PASSWORD"]
-            // keyAlias keystoreProperties["RELEASE_KEY_ALIAS"]
-            // keyPassword keystoreProperties["RELEASE_KEY_PASSWORD"]
-
             // Bitrise
             storeFile file("key/my_key.keystore")
             storePassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PASSWORD")
             keyAlias System.getenv("BITRISEIO_ANDROID_KEYSTORE_ALIAS")
             keyPassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD")   
+        }
+
+        local {
+            // Local build
+            def keystorePropertiesFile = rootProject.file('keystore.properties')
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            storeFile file(keystoreProperties["RELEASE_STORE_FILE"])
+            storePassword keystoreProperties["RELEASE_STORE_PASSWORD"]
+            keyAlias keystoreProperties["RELEASE_KEY_ALIAS"]
+            keyPassword keystoreProperties["RELEASE_KEY_PASSWORD"] 
         }
     }
 
@@ -187,6 +190,15 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+
+        releaselocal {
+            initWith release    
+            signingConfig signingConfigs.local
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            //applicationIdSuffix ".releaselocal" 
+            matchingFallbacks =  ['release']
+        }
     }
 
     flavorDimensions "version"
@@ -194,9 +206,9 @@ android {
       internal {
         // dimension "version"
         // applicationId "com.foo.qa.demo"
-        versionCode 34
-        versionName "0.2.0"
-        // signingConfig signingConfigs.release
+        versionCode 38
+        versionName "0.2.5"
+        signingConfig signingConfigs.release
       }
       closed {
         versionCode 1
@@ -232,6 +244,8 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+    implementation 'com.android.support:multidex:2.0.1'
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
     }
@@ -249,6 +263,7 @@ dependencies {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
         releaseImplementation files(hermesPath + "hermes-release.aar")
+        releaselocalImplementation files(hermesPath + "hermes-release.aar")
     } else {
         implementation jscFlavor
     }
