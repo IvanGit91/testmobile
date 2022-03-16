@@ -41,19 +41,26 @@ default_platform(:android)
 
 
 # ------------- BUILD WITH LOCAL AND BITRISE ------------------- #
-# Ex: fastlane ld_deploy flavor_type:internal update:patch
+# Ex build local: fastlane ld_deploy flavor_type:internal build_type:releaselocal update:patch
+# Ex build bitrise: fastlane ld_deploy flavor_type:internal build_type:release update:patch
 platform :android do
 
   ADMITTED_BUMP = ["major", "minor", "patch"]
   ADMITTED_FLAVOR = ["internal", "closed", "open"]
+  ADMITTED_BUILDTYPE = ["release", "releaselocal"]
 
   desc "Clean, increment version/name, build, deploy and submit a new testflight version"
   lane :ld_deploy do |options|
 
     flavor_type = options[:flavor_type]
+    build_type = options[:build_type]
 
     check_flavor(
       flavor_type: flavor_type
+    )
+
+    check_build_type(
+      build_type: build_type
     )
 
     clean()
@@ -65,6 +72,7 @@ platform :android do
 
     build_and_deploy(
       flavor_type: flavor_type,
+      build_type: build_type,
       version_name: version_name
     )
 
@@ -87,6 +95,19 @@ platform :android do
   end
 
 
+  lane :check_build_type do |options|
+    build_type = options[:build_type]
+    if build_type == nil
+      UI.user_error!("'build_type' parameter not present")
+    end
+
+    if !ADMITTED_BUILDTYPE.include?(build_type)
+      UI.user_error!("'" + build_type + "' must be one of: 'release', 'releaselocal'")
+    end
+    UI.message("Build type present and correct: #{build_type}")
+  end
+
+
   lane :clean do
     gradle(task: 'clean')
     UI.message("Gradle clean success")
@@ -100,8 +121,6 @@ platform :android do
 
     if to_update == nil
       UI.user_error!("'update' parameter not present")
-      # UI.important "Skipping build because a cached build is available!"
-      # next # skip doing the rest of this lane
     end
 
     if !ADMITTED_BUMP.include?(to_update)
@@ -125,11 +144,12 @@ platform :android do
 
   lane :build_and_deploy do |options|
     flavor_type = options[:flavor_type]
+    build_type = options[:build_type]
     gradle(
       # task: 'assemble',
       task: 'bundle',
       flavor: flavor_type,
-      build_type: 'Release',     
+      build_type: build_type,     
       print_command: false
     )
     UI.message("Gradle bundle succeded")
@@ -157,7 +177,24 @@ platform :android do
   end
 
 
-  # TESTING
+  # ---------------------------- TESTING -----------------------------
+
+  lane :testbuild do
+    gradle(task: 'clean')
+    UI.message("Gradle clean success")
+
+    gradle(
+      # task: 'assemble',
+      task: 'bundle',
+      flavor: 'internal',
+      build_type: 'releaselocal',     
+      print_command: false,
+      flags: '--stacktrace'
+    )
+    UI.message("Gradle bundle succeded")
+  end
+
+
   lane :show_version do
     # Default
     version = get_version_name(app_project_dir: '**/app')

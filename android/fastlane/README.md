@@ -31,6 +31,14 @@ Clean, increment version/name, build, deploy and submit a new testflight version
 
 
 
+### android check_build_type
+
+```sh
+[bundle exec] fastlane android check_build_type
+```
+
+
+
 ### android clean
 
 ```sh
@@ -59,6 +67,14 @@ Clean, increment version/name, build, deploy and submit a new testflight version
 
 ```sh
 [bundle exec] fastlane android commit_and_push
+```
+
+
+
+### android testbuild
+
+```sh
+[bundle exec] fastlane android testbuild
 ```
 
 
