@@ -41,7 +41,7 @@ platform :ios do
 
     build_and_deploy()
 
-    commit_and_push()
+    pull_commit_and_push()
   end
 
 
@@ -57,7 +57,7 @@ platform :ios do
 
     build_and_deploy()
 
-    commit_and_push()
+    pull_commit_and_push()
   end
 
 
@@ -126,7 +126,10 @@ platform :ios do
   end
 
 
-  lane :commit_and_push do
+  lane :pull_commit_and_push do
+    git_pull
+    UI.message("Pull done")
+
     git_commit(path: ".", message: "Version Bump")
     UI.message("Commit done")
 
