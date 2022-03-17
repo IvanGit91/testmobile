@@ -504,7 +504,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.0.1;
 				DEVELOPMENT_TEAM = T7BTX5YHRP;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = test/Info.plist;
@@ -537,7 +537,7 @@
 				CODE_SIGN_IDENTITY = cbf26fc2a5bfda93b2ac6167dcc01c1667ea62e5;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = cbf26fc2a5bfda93b2ac6167dcc01c1667ea62e5;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.0.1;
 				DEVELOPMENT_TEAM = T7BTX5YHRP;
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
