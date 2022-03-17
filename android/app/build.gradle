@@ -206,8 +206,8 @@ android {
       internal {
         // dimension "version"
         // applicationId "com.foo.qa.demo"
-        versionCode 41
-        versionName "0.2.8"
+        versionCode 42
+        versionName "0.2.9"
         // signingConfig signingConfigs.release
       }
       closed {
