@@ -71,6 +71,22 @@ From bitrise, increment version, build app, push a new beta build to TestFlight,
 
 
 
+### ios inctest
+
+```sh
+[bundle exec] fastlane ios inctest
+```
+
+
+
+### ios incrementtest
+
+```sh
+[bundle exec] fastlane ios incrementtest
+```
+
+
+
 ### ios beta
 
 ```sh
